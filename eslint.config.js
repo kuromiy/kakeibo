@@ -1,10 +1,14 @@
 // https://docs.expo.dev/guides/using-eslint/
-const { defineConfig } = require('eslint/config');
-const expoConfig = require('eslint-config-expo/flat');
+import { createRequire } from 'module';
+const require = createRequire(import.meta.url);
 
-module.exports = defineConfig([
-  expoConfig,
+const expoConfig = require('eslint-config-expo/flat');
+const eslintPluginPrettierRecommended = require('eslint-plugin-prettier/recommended');
+
+export default [
+  ...expoConfig,
+  eslintPluginPrettierRecommended,
   {
-    ignores: ['dist/*'],
+    ignores: ['dist/*', '.expo/**', 'node_modules/**'],
   },
-]);
+];
