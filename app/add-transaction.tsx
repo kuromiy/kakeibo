@@ -166,18 +166,10 @@ export default function AddTransactionScreen() {
             pressed && styles.headerButtonPressed,
           ]}
         >
-          <Text style={styles.cancelButton}>キャンセル</Text>
+          <Text style={styles.cancelButton}>←</Text>
         </Pressable>
-        <Text style={styles.headerTitle}>取引を追加</Text>
-        <Pressable
-          onPress={handleSave}
-          style={({ pressed }) => [
-            styles.headerButton,
-            pressed && styles.headerButtonPressed,
-          ]}
-        >
-          <Text style={styles.saveButton}>保存</Text>
-        </Pressable>
+        <Text style={styles.headerTitle}>新規追加</Text>
+        <View style={styles.headerSpacer} />
       </View>
 
       <ScrollView
@@ -376,15 +368,14 @@ const styles = StyleSheet.create({
   cancelButton: {
     ...theme.typography.body,
     color: theme.colors.textSecondary,
+    fontSize: 20,
   },
   headerTitle: {
     ...theme.typography.h3,
     color: theme.colors.text,
   },
-  saveButton: {
-    ...theme.typography.body,
-    color: theme.colors.primary,
-    fontWeight: "600",
+  headerSpacer: {
+    minWidth: 60,
   },
   scrollView: {
     flex: 1,

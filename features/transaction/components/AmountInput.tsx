@@ -55,7 +55,7 @@ export const AmountInput: React.FC<AmountInputProps> = ({
             isFocused && styles.amountInputFocused,
             error && styles.amountInputError,
           ]}
-          value={displayValue}
+          value={isFocused ? value : displayValue}
           onChangeText={handleChangeText}
           keyboardType="numeric"
           placeholder={placeholder}
