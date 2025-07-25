@@ -7,6 +7,7 @@ import {
   Animated,
   ViewStyle,
 } from "react-native";
+import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { theme } from "../../../shared/styles/theme";
 
 interface FABProps {
@@ -22,6 +23,7 @@ export const FAB: React.FC<FABProps> = ({
 }) => {
   const [isOpen, setIsOpen] = useState(false);
   const [animation] = useState(new Animated.Value(0));
+  const insets = useSafeAreaInsets();
 
   const toggleFAB = () => {
     const toValue = isOpen ? 0 : 1;
@@ -67,7 +69,7 @@ export const FAB: React.FC<FABProps> = ({
   });
 
   return (
-    <View style={[styles.container, style]}>
+    <View style={[styles.container, { bottom: theme.spacing.lg + insets.bottom }, style]}>
       {/* 背景オーバーレイ */}
       {isOpen && (
         <TouchableOpacity
@@ -138,7 +140,6 @@ export const FAB: React.FC<FABProps> = ({
 const styles = StyleSheet.create({
   container: {
     position: "absolute",
-    bottom: theme.spacing.lg,
     right: theme.spacing.lg,
     alignItems: "center",
   },

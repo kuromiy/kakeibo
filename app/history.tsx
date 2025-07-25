@@ -15,6 +15,7 @@ import {
   Transaction,
   mockTransactions,
   formatAmount,
+  getCategoryByName,
 } from "../shared/constants/mockData";
 
 // 日付でトランザクションをグループ化する関数
@@ -101,33 +102,51 @@ export default function HistoryScreen() {
     transaction: Transaction,
     index: number,
     array: Transaction[],
-  ) => (
-    <View
-      key={transaction.id}
-      style={[
-        styles.transactionItem,
-        index < array.length - 1 && styles.transactionItemBorder,
-      ]}
-    >
-      <View style={styles.transactionInfo}>
-        <Text style={styles.transactionCategory}>{transaction.category}</Text>
-        {transaction.memo && (
-          <Text style={styles.transactionMemo}>{transaction.memo}</Text>
-        )}
-      </View>
-      <Text
+  ) => {
+    const category = getCategoryByName(transaction.category);
+
+    return (
+      <View
+        key={transaction.id}
         style={[
-          styles.transactionAmount,
-          transaction.type === "income"
-            ? styles.incomeAmount
-            : styles.expenseAmount,
+          styles.transactionItem,
+          index < array.length - 1 && styles.transactionItemBorder,
         ]}
       >
-        {transaction.type === "income" ? "+" : "-"}
-        {formatAmount(transaction.amount)}
-      </Text>
-    </View>
-  );
+        <View style={styles.transactionLeft}>
+          {category && (
+            <View
+              style={[
+                styles.categoryIconContainer,
+                { backgroundColor: category.color },
+              ]}
+            >
+              <Text style={styles.categoryIcon}>{category.icon}</Text>
+            </View>
+          )}
+          <View style={styles.transactionInfo}>
+            <Text style={styles.transactionCategory}>
+              {transaction.category}
+            </Text>
+            {transaction.memo && (
+              <Text style={styles.transactionMemo}>{transaction.memo}</Text>
+            )}
+          </View>
+        </View>
+        <Text
+          style={[
+            styles.transactionAmount,
+            transaction.type === "income"
+              ? styles.incomeAmount
+              : styles.expenseAmount,
+          ]}
+        >
+          {transaction.type === "income" ? "+" : "-"}
+          {formatAmount(transaction.amount)}
+        </Text>
+      </View>
+    );
+  };
 
   const renderDateGroup = ({
     date,
@@ -178,7 +197,10 @@ export default function HistoryScreen() {
   );
 
   return (
-    <SafeAreaView style={styles.safeArea} edges={["top", "left", "right"]}>
+    <SafeAreaView
+      style={styles.safeArea}
+      edges={["top", "left", "right", "bottom"]}
+    >
       <View style={styles.header}>
         <TouchableOpacity onPress={handleBack} style={styles.backButton}>
           <Text style={styles.backButtonText}>←</Text>
@@ -342,6 +364,22 @@ const styles = StyleSheet.create({
   transactionItemBorder: {
     borderBottomWidth: 1,
     borderBottomColor: theme.colors.border,
+  },
+  transactionLeft: {
+    flexDirection: "row",
+    alignItems: "center",
+    flex: 1,
+  },
+  categoryIconContainer: {
+    width: 36,
+    height: 36,
+    borderRadius: 18,
+    alignItems: "center",
+    justifyContent: "center",
+    marginRight: theme.spacing.sm,
+  },
+  categoryIcon: {
+    fontSize: 18,
   },
   transactionInfo: {
     flex: 1,

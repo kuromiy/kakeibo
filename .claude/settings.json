@@ -1,7 +1,10 @@
 {
     "permissions": {
         "defaultMode": "plan",
-        "allow": [],
+        "allow": [
+            "Bash(npm run check:*)",
+            "Bash(npm run lint:*)"
+        ],
         "deny": [
             "Bash(sudo:*)",
             "Bash(rm:*)",

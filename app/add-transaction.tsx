@@ -9,6 +9,8 @@ import {
   Pressable,
   Modal,
   Alert,
+  KeyboardAvoidingView,
+  Platform,
 } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { router, useLocalSearchParams } from "expo-router";
@@ -157,7 +159,10 @@ export default function AddTransactionScreen() {
   };
 
   return (
-    <SafeAreaView style={styles.safeArea} edges={["top", "left", "right"]}>
+    <SafeAreaView
+      style={styles.safeArea}
+      edges={["top", "left", "right", "bottom"]}
+    >
       <View style={styles.header}>
         <Pressable
           onPress={handleCancel}
@@ -172,155 +177,163 @@ export default function AddTransactionScreen() {
         <View style={styles.headerSpacer} />
       </View>
 
-      <ScrollView
-        style={styles.scrollView}
-        showsVerticalScrollIndicator={false}
+      <KeyboardAvoidingView
+        behavior={Platform.OS === "ios" ? "padding" : "height"}
+        style={styles.keyboardAvoidingView}
       >
-        {/* 収入/支出切り替え */}
-        <Card style={styles.card}>
-          <Text style={styles.sectionTitle}>取引タイプ</Text>
-          <View style={styles.typeToggle}>
-            <TouchableOpacity
-              style={[
-                styles.typeButton,
-                transactionType === "expense" && styles.typeButtonActive,
-                {
-                  backgroundColor:
-                    transactionType === "expense"
-                      ? theme.colors.expense
-                      : theme.colors.surface,
-                },
-              ]}
-              onPress={() => setTransactionType("expense")}
-            >
-              <Text
-                style={[
-                  styles.typeButtonText,
-                  transactionType === "expense" && styles.typeButtonTextActive,
-                ]}
-              >
-                支出
-              </Text>
-            </TouchableOpacity>
-            <TouchableOpacity
-              style={[
-                styles.typeButton,
-                transactionType === "income" && styles.typeButtonActive,
-                {
-                  backgroundColor:
-                    transactionType === "income"
-                      ? theme.colors.income
-                      : theme.colors.surface,
-                },
-              ]}
-              onPress={() => setTransactionType("income")}
-            >
-              <Text
-                style={[
-                  styles.typeButtonText,
-                  transactionType === "income" && styles.typeButtonTextActive,
-                ]}
-              >
-                収入
-              </Text>
-            </TouchableOpacity>
-          </View>
-        </Card>
-
-        {/* 金額入力 */}
-        <Card style={styles.card}>
-          <Text style={styles.sectionTitle}>金額</Text>
-          <AmountInput
-            value={amount}
-            onChangeAmount={handleAmountChange}
-            placeholder="0"
-            error={errors.amount}
-          />
-        </Card>
-
-        {/* カテゴリ選択 */}
-        <Card style={styles.card}>
-          <Text style={styles.sectionTitle}>カテゴリ</Text>
-          <View style={styles.categoriesGrid}>
-            {filteredCategories.map((category) => (
-              <TouchableOpacity
-                key={category.id}
-                style={[
-                  styles.categoryItem,
-                  selectedCategory?.id === category.id &&
-                    styles.categoryItemSelected,
-                  errors.category &&
-                    !selectedCategory &&
-                    styles.categoryItemError,
-                ]}
-                onPress={() => handleCategoryChange(category)}
-              >
-                <Text style={styles.categoryIcon}>{category.icon}</Text>
-                <Text style={styles.categoryName}>{category.name}</Text>
-              </TouchableOpacity>
-            ))}
-          </View>
-          {errors.category && (
-            <Text style={styles.errorText}>{errors.category}</Text>
-          )}
-        </Card>
-
-        {/* 日付選択 */}
-        <Card style={styles.card}>
-          <Text style={styles.sectionTitle}>日付</Text>
-          <TouchableOpacity
-            style={styles.dateSelector}
-            onPress={() => setShowDatePicker(true)}
-          >
-            <Text style={styles.dateText}>{formatDate(date)}</Text>
-          </TouchableOpacity>
-        </Card>
-
-        {/* 日付選択モーダル */}
-        <Modal
-          visible={showDatePicker}
-          transparent={true}
-          animationType="slide"
-          onRequestClose={() => setShowDatePicker(false)}
+        <ScrollView
+          style={styles.scrollView}
+          showsVerticalScrollIndicator={false}
+          keyboardShouldPersistTaps="handled"
+          contentInsetAdjustmentBehavior="automatic"
         >
-          <View style={styles.modalOverlay}>
-            <View style={styles.datePickerContainer}>
-              <View style={styles.datePickerHeader}>
-                <TouchableOpacity onPress={() => setShowDatePicker(false)}>
-                  <Text style={styles.datePickerButton}>キャンセル</Text>
-                </TouchableOpacity>
-                <Text style={styles.datePickerTitle}>日付を選択</Text>
-                <View style={styles.datePickerHeaderSpacer} />
-              </View>
-              <Calendar
-                selectedDate={date}
-                onDateSelect={handleDateChange}
-                style={styles.calendarContainer}
-              />
+          {/* 収入/支出切り替え */}
+          <Card style={styles.card}>
+            <Text style={styles.sectionTitle}>取引タイプ</Text>
+            <View style={styles.typeToggle}>
+              <TouchableOpacity
+                style={[
+                  styles.typeButton,
+                  transactionType === "expense" && styles.typeButtonActive,
+                  {
+                    backgroundColor:
+                      transactionType === "expense"
+                        ? theme.colors.expense
+                        : theme.colors.surface,
+                  },
+                ]}
+                onPress={() => setTransactionType("expense")}
+              >
+                <Text
+                  style={[
+                    styles.typeButtonText,
+                    transactionType === "expense" &&
+                      styles.typeButtonTextActive,
+                  ]}
+                >
+                  支出
+                </Text>
+              </TouchableOpacity>
+              <TouchableOpacity
+                style={[
+                  styles.typeButton,
+                  transactionType === "income" && styles.typeButtonActive,
+                  {
+                    backgroundColor:
+                      transactionType === "income"
+                        ? theme.colors.income
+                        : theme.colors.surface,
+                  },
+                ]}
+                onPress={() => setTransactionType("income")}
+              >
+                <Text
+                  style={[
+                    styles.typeButtonText,
+                    transactionType === "income" && styles.typeButtonTextActive,
+                  ]}
+                >
+                  収入
+                </Text>
+              </TouchableOpacity>
             </View>
-          </View>
-        </Modal>
+          </Card>
 
-        {/* メモ入力 */}
-        <Card style={styles.card}>
-          <Text style={styles.sectionTitle}>メモ（任意）</Text>
-          <TextInput
-            style={[styles.memoInput, errors.memo && styles.memoInputError]}
-            value={memo}
-            onChangeText={handleMemoChange}
-            placeholder="メモを入力してください"
-            placeholderTextColor={theme.colors.textSecondary}
-            multiline={true}
-            numberOfLines={3}
-            maxLength={200}
-            textAlignVertical="top"
-          />
-          <View style={styles.memoFooter}>
-            <Text style={styles.memoCharCount}>{memo.length}/200</Text>
-          </View>
-          {errors.memo && <Text style={styles.errorText}>{errors.memo}</Text>}
-        </Card>
-      </ScrollView>
+          {/* 金額入力 */}
+          <Card style={styles.card}>
+            <Text style={styles.sectionTitle}>金額</Text>
+            <AmountInput
+              value={amount}
+              onChangeAmount={handleAmountChange}
+              placeholder="0"
+              error={errors.amount}
+            />
+          </Card>
+
+          {/* カテゴリ選択 */}
+          <Card style={styles.card}>
+            <Text style={styles.sectionTitle}>カテゴリ</Text>
+            <View style={styles.categoriesGrid}>
+              {filteredCategories.map((category) => (
+                <TouchableOpacity
+                  key={category.id}
+                  style={[
+                    styles.categoryItem,
+                    selectedCategory?.id === category.id &&
+                      styles.categoryItemSelected,
+                    errors.category &&
+                      !selectedCategory &&
+                      styles.categoryItemError,
+                  ]}
+                  onPress={() => handleCategoryChange(category)}
+                >
+                  <Text style={styles.categoryIcon}>{category.icon}</Text>
+                  <Text style={styles.categoryName}>{category.name}</Text>
+                </TouchableOpacity>
+              ))}
+            </View>
+            {errors.category && (
+              <Text style={styles.errorText}>{errors.category}</Text>
+            )}
+          </Card>
+
+          {/* 日付選択 */}
+          <Card style={styles.card}>
+            <Text style={styles.sectionTitle}>日付</Text>
+            <TouchableOpacity
+              style={styles.dateSelector}
+              onPress={() => setShowDatePicker(true)}
+            >
+              <Text style={styles.dateText}>{formatDate(date)}</Text>
+            </TouchableOpacity>
+          </Card>
+
+          {/* 日付選択モーダル */}
+          <Modal
+            visible={showDatePicker}
+            transparent={true}
+            animationType="slide"
+            onRequestClose={() => setShowDatePicker(false)}
+          >
+            <View style={styles.modalOverlay}>
+              <View style={styles.datePickerContainer}>
+                <View style={styles.datePickerHeader}>
+                  <TouchableOpacity onPress={() => setShowDatePicker(false)}>
+                    <Text style={styles.datePickerButton}>キャンセル</Text>
+                  </TouchableOpacity>
+                  <Text style={styles.datePickerTitle}>日付を選択</Text>
+                  <View style={styles.datePickerHeaderSpacer} />
+                </View>
+                <Calendar
+                  selectedDate={date}
+                  onDateSelect={handleDateChange}
+                  style={styles.calendarContainer}
+                />
+              </View>
+            </View>
+          </Modal>
+
+          {/* メモ入力 */}
+          <Card style={styles.card}>
+            <Text style={styles.sectionTitle}>メモ（任意）</Text>
+            <TextInput
+              style={[styles.memoInput, errors.memo && styles.memoInputError]}
+              value={memo}
+              onChangeText={handleMemoChange}
+              placeholder="メモを入力してください"
+              placeholderTextColor={theme.colors.textSecondary}
+              multiline={true}
+              numberOfLines={3}
+              maxLength={200}
+              textAlignVertical="top"
+            />
+            <View style={styles.memoFooter}>
+              <Text style={styles.memoCharCount}>{memo.length}/200</Text>
+            </View>
+            {errors.memo && <Text style={styles.errorText}>{errors.memo}</Text>}
+          </Card>
+        </ScrollView>
+      </KeyboardAvoidingView>
 
       <View style={styles.buttonContainer}>
         <Button
@@ -376,6 +389,9 @@ const styles = StyleSheet.create({
   },
   headerSpacer: {
     minWidth: 60,
+  },
+  keyboardAvoidingView: {
+    flex: 1,
   },
   scrollView: {
     flex: 1,
@@ -454,6 +470,7 @@ const styles = StyleSheet.create({
     ...theme.typography.body,
     color: theme.colors.text,
     minHeight: 80,
+    maxHeight: 120,
     paddingVertical: theme.spacing.md,
     paddingHorizontal: theme.spacing.lg,
     backgroundColor: theme.colors.background,

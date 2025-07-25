@@ -16,6 +16,7 @@ import {
   getMonthlyBalance,
   getRecentTransactions,
   formatAmount,
+  getCategoryByName,
   Transaction,
 } from "../shared/constants/mockData";
 
@@ -32,31 +33,52 @@ export default function HomeScreen() {
     router.push("/add-transaction?type=expense");
   };
 
-  const renderTransactionItem = (transaction: Transaction) => (
-    <View key={transaction.id} style={styles.transactionItem}>
-      <View style={styles.transactionInfo}>
-        <Text style={styles.transactionCategory}>{transaction.category}</Text>
-        <Text style={styles.transactionDate}>{transaction.date}</Text>
-        {transaction.memo && (
-          <Text style={styles.transactionMemo}>{transaction.memo}</Text>
-        )}
+  const renderTransactionItem = (transaction: Transaction) => {
+    const category = getCategoryByName(transaction.category);
+
+    return (
+      <View key={transaction.id} style={styles.transactionItem}>
+        <View style={styles.transactionLeft}>
+          {category && (
+            <View
+              style={[
+                styles.categoryIconContainer,
+                { backgroundColor: category.color },
+              ]}
+            >
+              <Text style={styles.categoryIcon}>{category.icon}</Text>
+            </View>
+          )}
+          <View style={styles.transactionInfo}>
+            <Text style={styles.transactionCategory}>
+              {transaction.category}
+            </Text>
+            <Text style={styles.transactionDate}>{transaction.date}</Text>
+            {transaction.memo && (
+              <Text style={styles.transactionMemo}>{transaction.memo}</Text>
+            )}
+          </View>
+        </View>
+        <Text
+          style={[
+            styles.transactionAmount,
+            transaction.type === "income"
+              ? styles.incomeAmount
+              : styles.expenseAmount,
+          ]}
+        >
+          {transaction.type === "income" ? "+" : "-"}
+          {formatAmount(transaction.amount)}
+        </Text>
       </View>
-      <Text
-        style={[
-          styles.transactionAmount,
-          transaction.type === "income"
-            ? styles.incomeAmount
-            : styles.expenseAmount,
-        ]}
-      >
-        {transaction.type === "income" ? "+" : "-"}
-        {formatAmount(transaction.amount)}
-      </Text>
-    </View>
-  );
+    );
+  };
 
   return (
-    <SafeAreaView style={styles.safeArea} edges={["top", "left", "right"]}>
+    <SafeAreaView
+      style={styles.safeArea}
+      edges={["top", "left", "right", "bottom"]}
+    >
       <ScrollView
         style={styles.scrollView}
         showsVerticalScrollIndicator={false}
@@ -236,9 +258,25 @@ const styles = StyleSheet.create({
     flexDirection: "row",
     justifyContent: "space-between",
     alignItems: "center",
-    paddingVertical: theme.spacing.xs,
+    paddingVertical: theme.spacing.sm,
     borderBottomWidth: 1,
     borderBottomColor: theme.colors.border,
+  },
+  transactionLeft: {
+    flexDirection: "row",
+    alignItems: "center",
+    flex: 1,
+  },
+  categoryIconContainer: {
+    width: 36,
+    height: 36,
+    borderRadius: 18,
+    alignItems: "center",
+    justifyContent: "center",
+    marginRight: theme.spacing.sm,
+  },
+  categoryIcon: {
+    fontSize: 18,
   },
   transactionInfo: {
     flex: 1,
