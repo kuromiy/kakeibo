@@ -1,15 +1,17 @@
 import React from "react";
-import { StyleSheet, View, Text, ScrollView, SafeAreaView } from "react-native";
-import { Card } from "../components/Card";
-import { FAB } from "../components/FAB";
-import { theme } from "../styles/theme";
+import { StyleSheet, View, Text, ScrollView } from "react-native";
+import { SafeAreaView } from "react-native-safe-area-context";
+import { router } from "expo-router";
+import { Card } from "../shared/components/Card";
+import { FAB } from "../features/home/components/FAB";
+import { theme } from "../shared/styles/theme";
 import {
   getTodayBalance,
   getMonthlyBalance,
   getRecentTransactions,
   formatAmount,
   Transaction,
-} from "../constants/mockData";
+} from "../shared/constants/mockData";
 
 export default function HomeScreen() {
   const todayBalance = getTodayBalance();
@@ -17,11 +19,11 @@ export default function HomeScreen() {
   const recentTransactions = getRecentTransactions(5);
 
   const handleAddIncome = () => {
-    console.log("収入を追加");
+    router.push("/add-transaction?type=income");
   };
 
   const handleAddExpense = () => {
-    console.log("支出を追加");
+    router.push("/add-transaction?type=expense");
   };
 
   const renderTransactionItem = (transaction: Transaction) => (
@@ -48,7 +50,7 @@ export default function HomeScreen() {
   );
 
   return (
-    <SafeAreaView style={styles.container}>
+    <SafeAreaView style={styles.safeArea} edges={["top", "left", "right"]}>
       <ScrollView
         style={styles.scrollView}
         showsVerticalScrollIndicator={false}
@@ -142,6 +144,10 @@ export default function HomeScreen() {
 }
 
 const styles = StyleSheet.create({
+  safeArea: {
+    flex: 1,
+    backgroundColor: theme.colors.background,
+  },
   container: {
     flex: 1,
     backgroundColor: theme.colors.background,

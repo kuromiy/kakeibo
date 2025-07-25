@@ -1,3 +1,5 @@
+import { generateId } from '../utils/generateId';
+
 export interface Transaction {
   id: string
   amount: number
@@ -30,7 +32,8 @@ export const mockCategories: Category[] = [
   { id: '9', name: 'その他', type: 'income', icon: '➕', color: '#CDDC39' },
 ]
 
-export const mockTransactions: Transaction[] = [
+// トランザクションデータをミュータブルな配列として定義
+export let mockTransactions: Transaction[] = [
   {
     id: '1',
     amount: 350000,
@@ -161,3 +164,46 @@ export const formatAmount = (amount: number) => {
     minimumFractionDigits: 0,
   })
 }
+
+// 新しいトランザクションを追加する関数
+export const addTransaction = (transactionData: {
+  amount: number;
+  type: 'income' | 'expense';
+  category: string;
+  date: string;
+  memo?: string;
+}): Transaction => {
+  const newTransaction: Transaction = {
+    id: generateId(),
+    amount: transactionData.amount,
+    type: transactionData.type,
+    category: transactionData.category,
+    date: transactionData.date,
+    memo: transactionData.memo || undefined,
+  };
+
+  // 配列の先頭に追加（最新が最初に表示されるように）
+  mockTransactions.unshift(newTransaction);
+  
+  return newTransaction;
+};
+
+// トランザクションを削除する関数（将来の機能拡張用）
+export const removeTransaction = (id: string): boolean => {
+  const index = mockTransactions.findIndex(transaction => transaction.id === id);
+  if (index !== -1) {
+    mockTransactions.splice(index, 1);
+    return true;
+  }
+  return false;
+};
+
+// トランザクションを更新する関数（将来の機能拡張用）
+export const updateTransaction = (id: string, updatedData: Partial<Transaction>): Transaction | null => {
+  const index = mockTransactions.findIndex(transaction => transaction.id === id);
+  if (index !== -1) {
+    mockTransactions[index] = { ...mockTransactions[index], ...updatedData };
+    return mockTransactions[index];
+  }
+  return null;
+};
