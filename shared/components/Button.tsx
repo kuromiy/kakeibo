@@ -16,6 +16,7 @@ interface ButtonProps {
   disabled?: boolean;
   style?: ViewStyle;
   textStyle?: TextStyle;
+  className?: string; // NativeWind対応
 }
 
 export const Button: React.FC<ButtonProps> = ({
@@ -26,6 +27,7 @@ export const Button: React.FC<ButtonProps> = ({
   disabled = false,
   style,
   textStyle,
+  className,
 }) => {
   const buttonStyle = [
     styles.button,
@@ -46,6 +48,7 @@ export const Button: React.FC<ButtonProps> = ({
   return (
     <TouchableOpacity
       style={buttonStyle}
+      className={className}
       onPress={onPress}
       disabled={disabled}
       activeOpacity={0.7}
