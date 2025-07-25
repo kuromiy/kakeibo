@@ -1,5 +1,11 @@
 import React from "react";
-import { StyleSheet, View, Text, ScrollView } from "react-native";
+import {
+  StyleSheet,
+  View,
+  Text,
+  ScrollView,
+  TouchableOpacity,
+} from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { router } from "expo-router";
 import { Card } from "../shared/components/Card";
@@ -126,7 +132,15 @@ export default function HomeScreen() {
 
         {/* 最近の取引履歴 */}
         <Card style={styles.historyCard}>
-          <Text style={styles.cardTitle}>最近の取引</Text>
+          <View style={styles.historyHeader}>
+            <Text style={styles.cardTitle}>最近の取引</Text>
+            <TouchableOpacity
+              onPress={() => router.push("/history")}
+              style={styles.viewAllButton}
+            >
+              <Text style={styles.viewAllButtonText}>すべて見る →</Text>
+            </TouchableOpacity>
+          </View>
           {recentTransactions.length > 0 ? (
             <View style={styles.transactionList}>
               {recentTransactions.map(renderTransactionItem)}
@@ -199,6 +213,21 @@ const styles = StyleSheet.create({
   historyCard: {
     margin: theme.spacing.md,
     marginTop: theme.spacing.sm,
+  },
+  historyHeader: {
+    flexDirection: "row",
+    justifyContent: "space-between",
+    alignItems: "center",
+    marginBottom: theme.spacing.md,
+  },
+  viewAllButton: {
+    paddingVertical: theme.spacing.xs,
+    paddingHorizontal: theme.spacing.sm,
+  },
+  viewAllButtonText: {
+    ...theme.typography.caption,
+    color: theme.colors.primary,
+    fontWeight: "600",
   },
   transactionList: {
     gap: theme.spacing.sm,

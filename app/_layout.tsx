@@ -26,6 +26,7 @@ export default function RootLayout() {
             contentStyle: { backgroundColor: "#0A0A0A" },
           }}
         />
+        <Stack.Screen name="history" options={{ headerShown: false }} />
         <Stack.Screen name="+not-found" />
       </Stack>
       <StatusBar style="light" />
