@@ -24,7 +24,7 @@ export default function RootLayout() {
           options={{
             headerShown: false,
             presentation: "modal",
-            contentStyle: { backgroundColor: "#0A0A0A" },
+            contentStyle: { backgroundColor: "#0A0A0A" }, // theme.colors.background
           }}
         />
         <Stack.Screen name="history" options={{ headerShown: false }} />

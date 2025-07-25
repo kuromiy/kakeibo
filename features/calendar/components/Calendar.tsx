@@ -3,22 +3,22 @@ import {
   View,
   Text,
   TouchableOpacity,
-  StyleSheet,
   ViewStyle,
 } from "react-native";
-import { theme } from "../../../shared/styles/theme";
 import { useCalendar, CalendarDay } from "../hooks/useCalendar";
 
 interface CalendarProps {
   selectedDate: Date;
   onDateSelect: (date: Date) => void;
   style?: ViewStyle;
+  className?: string;
 }
 
 export const Calendar: React.FC<CalendarProps> = ({
   selectedDate,
   onDateSelect,
   style,
+  className,
 }) => {
   const {
     calendarDays,
@@ -36,71 +36,103 @@ export const Calendar: React.FC<CalendarProps> = ({
   };
 
   const renderDay = (day: CalendarDay, index: number) => {
-    const dayStyle = [
-      styles.dayCell,
-      !day.isCurrentMonth && styles.dayOutsideMonth,
-      day.isToday && styles.dayToday,
-      day.isSelected && styles.daySelected,
-    ];
+    // 日付セルのクラス
+    const dayCellClassName = [
+      "justify-center items-center rounded",
+      "opacity-30", // デフォルトは月外なので薄く
+      day.isCurrentMonth && "opacity-100",
+      day.isToday && "bg-primary",
+      day.isSelected && "bg-income",
+    ].filter(Boolean).join(" ");
 
-    const textStyle = [
-      styles.dayText,
-      !day.isCurrentMonth && styles.dayTextOutsideMonth,
-      day.isToday && styles.dayTextToday,
-      day.isSelected && styles.dayTextSelected,
-    ];
+    // 日付テキストのクラス  
+    const dayTextClassName = [
+      "text-base",
+      day.isCurrentMonth ? "text-text" : "text-textSecondary",
+      (day.isToday || day.isSelected) && "text-background font-bold",
+    ].filter(Boolean).join(" ");
 
     return (
       <TouchableOpacity
         key={index}
-        style={dayStyle}
+        className={dayCellClassName}
+        style={{ width: "14.28%", height: 40 }} // 7分の1の幅
         onPress={() => handleDatePress(day)}
         activeOpacity={0.7}
       >
-        <Text style={textStyle}>{day.day}</Text>
+        <Text className={dayTextClassName}>{day.day}</Text>
       </TouchableOpacity>
     );
   };
 
+  // コンテナクラス
+  const containerClassName = [
+    "bg-surface rounded-md p-4",
+    className,
+  ].filter(Boolean).join(" ");
+
+  // ヘッダーレイアウトクラス
+  const headerClassName = "flex-row justify-between items-center mb-4";
+  
+  // ナビゲーションボタンクラス
+  const navButtonClassName = "w-10 h-10 rounded-full bg-background justify-center items-center";
+  
+  // ナビゲーションボタンテキストクラス
+  const navButtonTextClassName = "text-lg text-text";
+  
+  // 月ボタンクラス
+  const monthButtonClassName = "py-2 px-4 rounded";
+  
+  // 月テキストクラス
+  const monthTextClassName = "text-xl font-bold text-text";
+  
+  // 曜日ヘッダークラス
+  const weekDaysHeaderClassName = "flex-row mb-2";
+  
+  // 曜日セルクラス
+  const weekDayCellClassName = "flex-1 h-8 justify-center items-center";
+  
+  // カレンダーグリッドクラス
+  const calendarGridClassName = "flex-row flex-wrap";
+
   return (
-    <View style={[styles.container, style]}>
+    <View className={containerClassName} style={style}>
       {/* ヘッダー（月名と前/次ボタン） */}
-      <View style={styles.header}>
+      <View className={headerClassName}>
         <TouchableOpacity
-          style={styles.navButton}
+          className={navButtonClassName}
           onPress={goToPrevMonth}
           activeOpacity={0.7}
         >
-          <Text style={styles.navButtonText}>←</Text>
+          <Text className={navButtonTextClassName}>←</Text>
         </TouchableOpacity>
 
         <TouchableOpacity
-          style={styles.monthButton}
+          className={monthButtonClassName}
           onPress={goToToday}
           activeOpacity={0.7}
         >
-          <Text style={styles.monthText}>{getMonthName()}</Text>
+          <Text className={monthTextClassName}>{getMonthName()}</Text>
         </TouchableOpacity>
 
         <TouchableOpacity
-          style={styles.navButton}
+          className={navButtonClassName}
           onPress={goToNextMonth}
           activeOpacity={0.7}
         >
-          <Text style={styles.navButtonText}>→</Text>
+          <Text className={navButtonTextClassName}>→</Text>
         </TouchableOpacity>
       </View>
 
       {/* 曜日ヘッダー */}
-      <View style={styles.weekDaysHeader}>
+      <View className={weekDaysHeaderClassName}>
         {weekDays.map((weekDay, index) => (
-          <View key={index} style={styles.weekDayCell}>
+          <View key={index} className={weekDayCellClassName}>
             <Text
-              style={[
-                styles.weekDayText,
-                index === 0 && styles.weekDaySunday, // 日曜日
-                index === 6 && styles.weekDaySaturday, // 土曜日
-              ]}
+              className="text-sm font-semibold text-textSecondary"
+              style={{
+                color: index === 0 ? "#FF6B6B" : index === 6 ? "#4DABF7" : "#CCCCCC"
+              }}
             >
               {weekDay}
             </Text>
@@ -109,103 +141,9 @@ export const Calendar: React.FC<CalendarProps> = ({
       </View>
 
       {/* カレンダーグリッド */}
-      <View style={styles.calendarGrid}>
+      <View className={calendarGridClassName}>
         {calendarDays.map((day, index) => renderDay(day, index))}
       </View>
     </View>
   );
 };
-
-const styles = StyleSheet.create({
-  container: {
-    backgroundColor: theme.colors.surface,
-    borderRadius: theme.borderRadius.md,
-    padding: theme.spacing.md,
-  },
-  header: {
-    flexDirection: "row",
-    justifyContent: "space-between",
-    alignItems: "center",
-    marginBottom: theme.spacing.md,
-  },
-  navButton: {
-    width: 40,
-    height: 40,
-    borderRadius: 20,
-    backgroundColor: theme.colors.background,
-    justifyContent: "center",
-    alignItems: "center",
-  },
-  navButtonText: {
-    ...theme.typography.h3,
-    color: theme.colors.text,
-    fontSize: 18,
-  },
-  monthButton: {
-    paddingVertical: theme.spacing.sm,
-    paddingHorizontal: theme.spacing.md,
-    borderRadius: theme.borderRadius.sm,
-  },
-  monthText: {
-    ...theme.typography.h3,
-    color: theme.colors.text,
-    fontWeight: "bold",
-  },
-  weekDaysHeader: {
-    flexDirection: "row",
-    marginBottom: theme.spacing.sm,
-  },
-  weekDayCell: {
-    flex: 1,
-    height: 30,
-    justifyContent: "center",
-    alignItems: "center",
-  },
-  weekDayText: {
-    ...theme.typography.caption,
-    color: theme.colors.textSecondary,
-    fontWeight: "600",
-  },
-  weekDaySunday: {
-    color: "#FF6B6B", // 日曜日は赤色
-  },
-  weekDaySaturday: {
-    color: "#4DABF7", // 土曜日は青色
-  },
-  calendarGrid: {
-    flexDirection: "row",
-    flexWrap: "wrap",
-  },
-  dayCell: {
-    width: "14.28%", // 7分の1
-    height: 40,
-    justifyContent: "center",
-    alignItems: "center",
-    borderRadius: theme.borderRadius.sm,
-  },
-  dayOutsideMonth: {
-    opacity: 0.3,
-  },
-  dayToday: {
-    backgroundColor: theme.colors.primary,
-  },
-  daySelected: {
-    backgroundColor: theme.colors.income,
-  },
-  dayText: {
-    ...theme.typography.body,
-    color: theme.colors.text,
-    fontSize: 16,
-  },
-  dayTextOutsideMonth: {
-    color: theme.colors.textSecondary,
-  },
-  dayTextToday: {
-    color: theme.colors.background,
-    fontWeight: "bold",
-  },
-  dayTextSelected: {
-    color: theme.colors.background,
-    fontWeight: "bold",
-  },
-});

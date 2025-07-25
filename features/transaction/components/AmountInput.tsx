@@ -4,10 +4,8 @@ import {
   Text,
   TextInput,
   TouchableOpacity,
-  StyleSheet,
   ViewStyle,
 } from "react-native";
-import { theme } from "../../../shared/styles/theme";
 
 interface AmountInputProps {
   value: string;
@@ -15,6 +13,7 @@ interface AmountInputProps {
   style?: ViewStyle;
   placeholder?: string;
   error?: string;
+  className?: string;
 }
 
 export const AmountInput: React.FC<AmountInputProps> = ({
@@ -23,6 +22,7 @@ export const AmountInput: React.FC<AmountInputProps> = ({
   style,
   placeholder = "0",
   error,
+  className,
 }) => {
   const [isFocused, setIsFocused] = useState(false);
 
@@ -41,79 +41,54 @@ export const AmountInput: React.FC<AmountInputProps> = ({
 
   const displayValue = value ? formatNumber(value) : placeholder;
 
+  // Tailwindクラス定義
+  const containerClassName = [
+    "w-full",
+    className,
+  ].filter(Boolean).join(" ");
+
+  const inputContainerClassName = [
+    "flex-row items-center justify-center py-6 bg-background rounded-md border",
+    error ? "border-error" : "border-border",
+  ].join(" ");
+
+  const currencySymbolClassName = "text-2xl text-textSecondary mr-2";
+
+  const amountInputClassName = [
+    "text-4xl font-bold text-center min-w-25 bg-transparent",
+    isFocused 
+      ? "text-primary" 
+      : error 
+        ? "text-error" 
+        : "text-text",
+  ].join(" ");
+
+  const errorTextClassName = "text-sm text-error mt-1 text-center";
+
   return (
-    <View style={[styles.container, style]}>
+    <View className={containerClassName} style={style}>
       <TouchableOpacity
-        style={[styles.inputContainer, error && styles.inputContainerError]}
+        className={inputContainerClassName}
         onPress={() => setIsFocused(true)}
         activeOpacity={1}
       >
-        <Text style={styles.currencySymbol}>¥</Text>
+        <Text className={currencySymbolClassName}>¥</Text>
         <TextInput
-          style={[
-            styles.amountInput,
-            isFocused && styles.amountInputFocused,
-            error && styles.amountInputError,
-          ]}
+          className={amountInputClassName}
           value={isFocused ? value : displayValue}
           onChangeText={handleChangeText}
           keyboardType="numeric"
           placeholder={placeholder}
-          placeholderTextColor={theme.colors.textSecondary}
+          placeholderTextColor="#CCCCCC" // theme.colors.textSecondary
           onFocus={() => setIsFocused(true)}
           onBlur={() => setIsFocused(false)}
           selection={
             isFocused ? { start: value.length, end: value.length } : undefined
           }
-          selectionColor={theme.colors.primary}
+          selectionColor="#FFD700" // theme.colors.primary
         />
       </TouchableOpacity>
-      {error && <Text style={styles.errorText}>{error}</Text>}
+      {error && <Text className={errorTextClassName}>{error}</Text>}
     </View>
   );
 };
-
-const styles = StyleSheet.create({
-  container: {
-    width: "100%",
-  },
-  inputContainer: {
-    flexDirection: "row",
-    alignItems: "center",
-    justifyContent: "center",
-    paddingVertical: theme.spacing.lg,
-    backgroundColor: theme.colors.background,
-    borderRadius: theme.borderRadius.md,
-    borderWidth: 1,
-    borderColor: theme.colors.border,
-  },
-  inputContainerError: {
-    borderColor: theme.colors.error,
-  },
-  currencySymbol: {
-    ...theme.typography.h2,
-    color: theme.colors.textSecondary,
-    marginRight: theme.spacing.sm,
-  },
-  amountInput: {
-    ...theme.typography.h1,
-    color: theme.colors.text,
-    fontSize: 36,
-    fontWeight: "bold",
-    textAlign: "center",
-    minWidth: 100,
-    backgroundColor: "transparent",
-  },
-  amountInputFocused: {
-    color: theme.colors.primary,
-  },
-  amountInputError: {
-    color: theme.colors.error,
-  },
-  errorText: {
-    ...theme.typography.caption,
-    color: theme.colors.error,
-    marginTop: theme.spacing.xs,
-    textAlign: "center",
-  },
-});

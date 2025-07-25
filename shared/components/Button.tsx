@@ -2,11 +2,9 @@ import React from "react";
 import {
   TouchableOpacity,
   Text,
-  StyleSheet,
   ViewStyle,
   TextStyle,
 } from "react-native";
-import { theme } from "../styles/theme";
 
 interface ButtonProps {
   title: string;
@@ -16,7 +14,7 @@ interface ButtonProps {
   disabled?: boolean;
   style?: ViewStyle;
   textStyle?: TextStyle;
-  className?: string; // NativeWind対応
+  className?: string;
 }
 
 export const Button: React.FC<ButtonProps> = ({
@@ -29,114 +27,66 @@ export const Button: React.FC<ButtonProps> = ({
   textStyle,
   className,
 }) => {
-  const buttonStyle = [
-    styles.button,
-    styles[variant],
-    styles[size],
-    disabled && styles.disabled,
-    style,
-  ];
+  // ベースクラス
+  const baseClasses = "rounded-md items-center justify-center shadow-sm active:opacity-70";
+  
+  // バリアント別のクラス
+  const variantClasses = {
+    primary: "bg-primary",
+    secondary: "bg-surface border border-border",
+    income: "bg-income",
+    expense: "bg-expense",
+  };
 
-  const textStyles = [
-    styles.text,
-    styles[`${variant}Text` as keyof typeof styles],
-    styles[`${size}Text` as keyof typeof styles],
-    disabled && styles.disabledText,
-    textStyle,
-  ];
+  // サイズ別のクラス
+  const sizeClasses = {
+    sm: "py-1 px-2",
+    md: "py-2 px-4",
+    lg: "py-4 px-6",
+  };
+
+  // テキストバリアント別のクラス
+  const textVariantClasses = {
+    primary: "text-background",
+    secondary: "text-text",
+    income: "text-background",
+    expense: "text-background",
+  };
+
+  // テキストサイズ別のクラス
+  const textSizeClasses = {
+    sm: "text-sm",
+    md: "text-base",
+    lg: "text-xl",
+  };
+
+  // 最終的なクラス名を構築
+  const buttonClassName = [
+    baseClasses,
+    variantClasses[variant],
+    sizeClasses[size],
+    disabled && "opacity-50",
+    className,
+  ].filter(Boolean).join(" ");
+
+  const textClassName = [
+    "font-semibold text-center",
+    textVariantClasses[variant],
+    textSizeClasses[size],
+    disabled && "opacity-70",
+  ].filter(Boolean).join(" ");
 
   return (
     <TouchableOpacity
-      style={buttonStyle}
-      className={className}
+      className={buttonClassName}
+      style={style}
       onPress={onPress}
       disabled={disabled}
       activeOpacity={0.7}
     >
-      <Text style={textStyles}>{title}</Text>
+      <Text className={textClassName} style={textStyle}>
+        {title}
+      </Text>
     </TouchableOpacity>
   );
 };
-
-const styles = StyleSheet.create({
-  button: {
-    borderRadius: theme.borderRadius.md,
-    alignItems: "center",
-    justifyContent: "center",
-    ...theme.shadows.sm,
-  },
-
-  // Variants
-  primary: {
-    backgroundColor: theme.colors.primary,
-  },
-  secondary: {
-    backgroundColor: theme.colors.surface,
-    borderWidth: 1,
-    borderColor: theme.colors.border,
-  },
-  income: {
-    backgroundColor: theme.colors.income,
-  },
-  expense: {
-    backgroundColor: theme.colors.expense,
-  },
-
-  // Sizes
-  sm: {
-    paddingVertical: theme.spacing.xs,
-    paddingHorizontal: theme.spacing.sm,
-  },
-  md: {
-    paddingVertical: theme.spacing.sm,
-    paddingHorizontal: theme.spacing.md,
-  },
-  lg: {
-    paddingVertical: theme.spacing.md,
-    paddingHorizontal: theme.spacing.lg,
-  },
-
-  // Disabled state
-  disabled: {
-    opacity: 0.5,
-  },
-
-  // Text styles
-  text: {
-    fontWeight: "600",
-    textAlign: "center",
-  },
-
-  // Text variants
-  primaryText: {
-    color: theme.colors.background,
-    fontSize: theme.typography.body.fontSize,
-  },
-  secondaryText: {
-    color: theme.colors.text,
-    fontSize: theme.typography.body.fontSize,
-  },
-  incomeText: {
-    color: theme.colors.background,
-    fontSize: theme.typography.body.fontSize,
-  },
-  expenseText: {
-    color: theme.colors.background,
-    fontSize: theme.typography.body.fontSize,
-  },
-
-  // Text sizes
-  smText: {
-    fontSize: theme.typography.caption.fontSize,
-  },
-  mdText: {
-    fontSize: theme.typography.body.fontSize,
-  },
-  lgText: {
-    fontSize: theme.typography.h3.fontSize,
-  },
-
-  disabledText: {
-    opacity: 0.7,
-  },
-});

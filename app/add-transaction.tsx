@@ -1,6 +1,5 @@
 import React, { useState } from "react";
 import {
-  StyleSheet,
   View,
   Text,
   TextInput,
@@ -18,7 +17,6 @@ import { Card } from "../shared/components/Card";
 import { Button } from "../shared/components/Button";
 import { AmountInput } from "../features/transaction/components/AmountInput";
 import { Calendar } from "../features/calendar/components/Calendar";
-import { theme } from "../shared/styles/theme";
 import {
   mockCategories,
   Category,
@@ -160,78 +158,74 @@ export default function AddTransactionScreen() {
 
   return (
     <SafeAreaView
-      style={styles.safeArea}
+      className="flex-1 bg-background"
       edges={["top", "left", "right", "bottom"]}
     >
-      <View style={styles.header}>
+      <View className="flex-row justify-between items-center px-4 py-2 border-b border-border">
         <Pressable
           onPress={handleCancel}
-          style={({ pressed }) => [
-            styles.headerButton,
-            pressed && styles.headerButtonPressed,
-          ]}
+          className="py-1 px-2 rounded min-w-15 items-center active:opacity-70 active:bg-surface"
         >
-          <Text style={styles.cancelButton}>←</Text>
+          <Text className="text-xl text-textSecondary">←</Text>
         </Pressable>
-        <Text style={styles.headerTitle}>新規追加</Text>
-        <View style={styles.headerSpacer} />
+        <Text className="text-xl font-semibold text-text">新規追加</Text>
+        <View className="min-w-15" />
       </View>
 
       <KeyboardAvoidingView
         behavior={Platform.OS === "ios" ? "padding" : "height"}
-        style={styles.keyboardAvoidingView}
+        className="flex-1"
       >
         <ScrollView
-          style={styles.scrollView}
+          className="flex-1"
           showsVerticalScrollIndicator={false}
           keyboardShouldPersistTaps="handled"
           contentInsetAdjustmentBehavior="automatic"
         >
           {/* 収入/支出切り替え */}
-          <Card style={styles.card}>
-            <Text style={styles.sectionTitle}>取引タイプ</Text>
-            <View style={styles.typeToggle}>
+          <Card className="mx-4 mb-2">
+            <Text className="text-xl font-semibold text-text mb-4">
+              取引タイプ
+            </Text>
+            <View className="flex-row bg-background rounded-md p-1">
               <TouchableOpacity
-                style={[
-                  styles.typeButton,
-                  transactionType === "expense" && styles.typeButtonActive,
-                  {
-                    backgroundColor:
-                      transactionType === "expense"
-                        ? theme.colors.expense
-                        : theme.colors.surface,
-                  },
-                ]}
+                className="flex-1 py-2 px-4 rounded items-center"
+                style={{
+                  backgroundColor:
+                    transactionType === "expense"
+                      ? "#FFA500" // theme.colors.expense
+                      : "#1A1A1A", // theme.colors.surface
+                }}
                 onPress={() => setTransactionType("expense")}
               >
                 <Text
-                  style={[
-                    styles.typeButtonText,
-                    transactionType === "expense" &&
-                      styles.typeButtonTextActive,
-                  ]}
+                  className={[
+                    "text-base font-semibold",
+                    transactionType === "expense"
+                      ? "text-background"
+                      : "text-textSecondary",
+                  ].join(" ")}
                 >
                   支出
                 </Text>
               </TouchableOpacity>
               <TouchableOpacity
-                style={[
-                  styles.typeButton,
-                  transactionType === "income" && styles.typeButtonActive,
-                  {
-                    backgroundColor:
-                      transactionType === "income"
-                        ? theme.colors.income
-                        : theme.colors.surface,
-                  },
-                ]}
+                className="flex-1 py-2 px-4 rounded items-center"
+                style={{
+                  backgroundColor:
+                    transactionType === "income"
+                      ? "#FFD700" // theme.colors.income
+                      : "#1A1A1A", // theme.colors.surface
+                }}
                 onPress={() => setTransactionType("income")}
               >
                 <Text
-                  style={[
-                    styles.typeButtonText,
-                    transactionType === "income" && styles.typeButtonTextActive,
-                  ]}
+                  className={[
+                    "text-base font-semibold",
+                    transactionType === "income"
+                      ? "text-background"
+                      : "text-textSecondary",
+                  ].join(" ")}
                 >
                   収入
                 </Text>
@@ -240,8 +234,8 @@ export default function AddTransactionScreen() {
           </Card>
 
           {/* 金額入力 */}
-          <Card style={styles.card}>
-            <Text style={styles.sectionTitle}>金額</Text>
+          <Card className="mx-4 mb-2">
+            <Text className="text-xl font-semibold text-text mb-4">金額</Text>
             <AmountInput
               value={amount}
               onChangeAmount={handleAmountChange}
@@ -251,40 +245,48 @@ export default function AddTransactionScreen() {
           </Card>
 
           {/* カテゴリ選択 */}
-          <Card style={styles.card}>
-            <Text style={styles.sectionTitle}>カテゴリ</Text>
-            <View style={styles.categoriesGrid}>
+          <Card className="mx-4 mb-2">
+            <Text className="text-xl font-semibold text-text mb-4">
+              カテゴリ
+            </Text>
+            <View className="flex-row flex-wrap gap-2">
               {filteredCategories.map((category) => (
                 <TouchableOpacity
                   key={category.id}
-                  style={[
-                    styles.categoryItem,
-                    selectedCategory?.id === category.id &&
-                      styles.categoryItemSelected,
-                    errors.category &&
-                      !selectedCategory &&
-                      styles.categoryItemError,
-                  ]}
+                  className={[
+                    "items-center justify-center py-4 px-2 bg-background rounded-md border-2 min-h-20",
+                    selectedCategory?.id === category.id
+                      ? "border-primary"
+                      : "border-transparent",
+                    errors.category && !selectedCategory && "border-error",
+                  ]
+                    .filter(Boolean)
+                    .join(" ")}
+                  style={{ width: "30%" }}
                   onPress={() => handleCategoryChange(category)}
                 >
-                  <Text style={styles.categoryIcon}>{category.icon}</Text>
-                  <Text style={styles.categoryName}>{category.name}</Text>
+                  <Text style={{ fontSize: 24, marginBottom: 4 }}>
+                    {category.icon}
+                  </Text>
+                  <Text className="text-sm text-text text-center font-medium">
+                    {category.name}
+                  </Text>
                 </TouchableOpacity>
               ))}
             </View>
             {errors.category && (
-              <Text style={styles.errorText}>{errors.category}</Text>
+              <Text className="text-sm text-error mt-1">{errors.category}</Text>
             )}
           </Card>
 
           {/* 日付選択 */}
-          <Card style={styles.card}>
-            <Text style={styles.sectionTitle}>日付</Text>
+          <Card className="mx-4 mb-2">
+            <Text className="text-xl font-semibold text-text mb-4">日付</Text>
             <TouchableOpacity
-              style={styles.dateSelector}
+              className="py-4 px-6 bg-background rounded-md items-center"
               onPress={() => setShowDatePicker(true)}
             >
-              <Text style={styles.dateText}>{formatDate(date)}</Text>
+              <Text className="text-lg text-text">{formatDate(date)}</Text>
             </TouchableOpacity>
           </Card>
 
@@ -295,256 +297,69 @@ export default function AddTransactionScreen() {
             animationType="slide"
             onRequestClose={() => setShowDatePicker(false)}
           >
-            <View style={styles.modalOverlay}>
-              <View style={styles.datePickerContainer}>
-                <View style={styles.datePickerHeader}>
+            <View className="flex-1 bg-black/50 justify-end">
+              <View className="bg-surface rounded-t-lg pb-10">
+                <View className="flex-row justify-between items-center px-6 py-4 border-b border-border">
                   <TouchableOpacity onPress={() => setShowDatePicker(false)}>
-                    <Text style={styles.datePickerButton}>キャンセル</Text>
+                    <Text className="text-base text-textSecondary">
+                      キャンセル
+                    </Text>
                   </TouchableOpacity>
-                  <Text style={styles.datePickerTitle}>日付を選択</Text>
-                  <View style={styles.datePickerHeaderSpacer} />
+                  <Text className="text-xl font-semibold text-text">
+                    日付を選択
+                  </Text>
+                  <View style={{ width: 60 }} />
                 </View>
                 <Calendar
                   selectedDate={date}
                   onDateSelect={handleDateChange}
-                  style={styles.calendarContainer}
+                  className="m-4"
                 />
               </View>
             </View>
           </Modal>
 
           {/* メモ入力 */}
-          <Card style={styles.card}>
-            <Text style={styles.sectionTitle}>メモ（任意）</Text>
+          <Card className="mx-4 mb-2">
+            <Text className="text-xl font-semibold text-text mb-4">
+              メモ（任意）
+            </Text>
             <TextInput
-              style={[styles.memoInput, errors.memo && styles.memoInputError]}
+              className={[
+                "text-base text-text min-h-20 max-h-30 py-4 px-6 bg-background rounded-md border",
+                errors.memo ? "border-error" : "border-border",
+              ].join(" ")}
               value={memo}
               onChangeText={handleMemoChange}
               placeholder="メモを入力してください"
-              placeholderTextColor={theme.colors.textSecondary}
+              placeholderTextColor="#CCCCCC" // theme.colors.textSecondary
               multiline={true}
               numberOfLines={3}
               maxLength={200}
               textAlignVertical="top"
             />
-            <View style={styles.memoFooter}>
-              <Text style={styles.memoCharCount}>{memo.length}/200</Text>
+            <View className="flex-row justify-end mt-1">
+              <Text className="text-sm text-textSecondary">
+                {memo.length}/200
+              </Text>
             </View>
-            {errors.memo && <Text style={styles.errorText}>{errors.memo}</Text>}
+            {errors.memo && (
+              <Text className="text-sm text-error mt-1">{errors.memo}</Text>
+            )}
           </Card>
         </ScrollView>
       </KeyboardAvoidingView>
 
-      <View style={styles.buttonContainer}>
+      <View className="p-4 border-t border-border">
         <Button
           title="保存"
           onPress={handleSave}
           variant={transactionType === "income" ? "income" : "expense"}
           size="lg"
-          style={styles.saveButtonFull}
+          className="w-full"
           disabled={!isFormValidState}
         />
       </View>
     </SafeAreaView>
   );
 }
-
-const styles = StyleSheet.create({
-  safeArea: {
-    flex: 1,
-    backgroundColor: theme.colors.background,
-  },
-  container: {
-    flex: 1,
-    backgroundColor: theme.colors.background,
-  },
-  header: {
-    flexDirection: "row",
-    justifyContent: "space-between",
-    alignItems: "center",
-    paddingHorizontal: theme.spacing.md,
-    paddingVertical: theme.spacing.sm,
-    borderBottomWidth: 1,
-    borderBottomColor: theme.colors.border,
-  },
-  headerButton: {
-    paddingVertical: theme.spacing.xs,
-    paddingHorizontal: theme.spacing.sm,
-    borderRadius: theme.borderRadius.sm,
-    minWidth: 60,
-    alignItems: "center",
-  },
-  headerButtonPressed: {
-    opacity: 0.7,
-    backgroundColor: theme.colors.surface,
-  },
-  cancelButton: {
-    ...theme.typography.body,
-    color: theme.colors.textSecondary,
-    fontSize: 20,
-  },
-  headerTitle: {
-    ...theme.typography.h3,
-    color: theme.colors.text,
-  },
-  headerSpacer: {
-    minWidth: 60,
-  },
-  keyboardAvoidingView: {
-    flex: 1,
-  },
-  scrollView: {
-    flex: 1,
-  },
-  card: {
-    margin: theme.spacing.md,
-    marginBottom: theme.spacing.sm,
-  },
-  sectionTitle: {
-    ...theme.typography.h3,
-    color: theme.colors.text,
-    marginBottom: theme.spacing.md,
-  },
-  typeToggle: {
-    flexDirection: "row",
-    backgroundColor: theme.colors.background,
-    borderRadius: theme.borderRadius.md,
-    padding: theme.spacing.xs,
-  },
-  typeButton: {
-    flex: 1,
-    paddingVertical: theme.spacing.sm,
-    paddingHorizontal: theme.spacing.md,
-    borderRadius: theme.borderRadius.sm,
-    alignItems: "center",
-  },
-  typeButtonActive: {},
-  typeButtonText: {
-    ...theme.typography.body,
-    color: theme.colors.textSecondary,
-    fontWeight: "600",
-  },
-  typeButtonTextActive: {
-    color: theme.colors.background,
-  },
-  categoriesGrid: {
-    flexDirection: "row",
-    flexWrap: "wrap",
-    gap: theme.spacing.sm,
-  },
-  categoryItem: {
-    width: "30%",
-    aspectRatio: 1,
-    alignItems: "center",
-    justifyContent: "center",
-    backgroundColor: theme.colors.background,
-    borderRadius: theme.borderRadius.md,
-    borderWidth: 2,
-    borderColor: "transparent",
-  },
-  categoryItemSelected: {
-    borderColor: theme.colors.primary,
-  },
-  categoryIcon: {
-    fontSize: 24,
-    marginBottom: theme.spacing.xs,
-  },
-  categoryName: {
-    ...theme.typography.caption,
-    color: theme.colors.text,
-    textAlign: "center",
-  },
-  dateSelector: {
-    paddingVertical: theme.spacing.md,
-    paddingHorizontal: theme.spacing.lg,
-    backgroundColor: theme.colors.background,
-    borderRadius: theme.borderRadius.md,
-    alignItems: "center",
-  },
-  dateText: {
-    ...theme.typography.body,
-    color: theme.colors.text,
-    fontSize: 18,
-  },
-  memoInput: {
-    ...theme.typography.body,
-    color: theme.colors.text,
-    minHeight: 80,
-    maxHeight: 120,
-    paddingVertical: theme.spacing.md,
-    paddingHorizontal: theme.spacing.lg,
-    backgroundColor: theme.colors.background,
-    borderRadius: theme.borderRadius.md,
-    borderWidth: 1,
-    borderColor: theme.colors.border,
-    textAlignVertical: "top",
-  },
-  memoInputError: {
-    borderColor: theme.colors.error,
-  },
-  memoFooter: {
-    flexDirection: "row",
-    justifyContent: "flex-end",
-    marginTop: theme.spacing.xs,
-  },
-  memoCharCount: {
-    ...theme.typography.caption,
-    color: theme.colors.textSecondary,
-  },
-  categoryItemError: {
-    borderColor: theme.colors.error,
-    borderWidth: 2,
-  },
-  errorText: {
-    ...theme.typography.caption,
-    color: theme.colors.error,
-    marginTop: theme.spacing.xs,
-  },
-  buttonContainer: {
-    padding: theme.spacing.md,
-    borderTopWidth: 1,
-    borderTopColor: theme.colors.border,
-  },
-  saveButtonFull: {
-    width: "100%",
-  },
-  // 日付選択モーダルのスタイル
-  modalOverlay: {
-    flex: 1,
-    backgroundColor: "rgba(0, 0, 0, 0.5)",
-    justifyContent: "flex-end",
-  },
-  datePickerContainer: {
-    backgroundColor: theme.colors.surface,
-    borderTopLeftRadius: theme.borderRadius.lg,
-    borderTopRightRadius: theme.borderRadius.lg,
-    paddingBottom: 40,
-  },
-  datePickerHeader: {
-    flexDirection: "row",
-    justifyContent: "space-between",
-    alignItems: "center",
-    paddingHorizontal: theme.spacing.lg,
-    paddingVertical: theme.spacing.md,
-    borderBottomWidth: 1,
-    borderBottomColor: theme.colors.border,
-  },
-  datePickerButton: {
-    ...theme.typography.body,
-    color: theme.colors.textSecondary,
-  },
-  datePickerConfirm: {
-    color: theme.colors.primary,
-    fontWeight: "600",
-  },
-  datePickerTitle: {
-    ...theme.typography.h3,
-    color: theme.colors.text,
-  },
-  datePickerHeaderSpacer: {
-    width: 60, // キャンセルボタンと同じ幅でバランスを取る
-  },
-  calendarContainer: {
-    margin: theme.spacing.md,
-  },
-});

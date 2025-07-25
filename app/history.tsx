@@ -1,6 +1,5 @@
 import React, { useState, useCallback } from "react";
 import {
-  StyleSheet,
   View,
   Text,
   ScrollView,
@@ -10,7 +9,6 @@ import {
 import { SafeAreaView } from "react-native-safe-area-context";
 import { router } from "expo-router";
 import { Card } from "../shared/components/Card";
-import { theme } from "../shared/styles/theme";
 import {
   Transaction,
   mockTransactions,
@@ -108,38 +106,38 @@ export default function HistoryScreen() {
     return (
       <View
         key={transaction.id}
-        style={[
-          styles.transactionItem,
-          index < array.length - 1 && styles.transactionItemBorder,
-        ]}
+        className={[
+          "flex-row justify-between items-center py-2 px-1",
+          index < array.length - 1 && "border-b border-border",
+        ]
+          .filter(Boolean)
+          .join(" ")}
       >
-        <View style={styles.transactionLeft}>
+        <View className="flex-row items-center flex-1">
           {category && (
             <View
-              style={[
-                styles.categoryIconContainer,
-                { backgroundColor: category.color },
-              ]}
+              className="w-9 h-9 rounded-full items-center justify-center mr-2"
+              style={{ backgroundColor: category.color }}
             >
-              <Text style={styles.categoryIcon}>{category.icon}</Text>
+              <Text style={{ fontSize: 18 }}>{category.icon}</Text>
             </View>
           )}
-          <View style={styles.transactionInfo}>
-            <Text style={styles.transactionCategory}>
+          <View className="flex-1">
+            <Text className="text-base text-text font-medium">
               {transaction.category}
             </Text>
             {transaction.memo && (
-              <Text style={styles.transactionMemo}>{transaction.memo}</Text>
+              <Text className="text-sm text-textSecondary mt-0.5">
+                {transaction.memo}
+              </Text>
             )}
           </View>
         </View>
         <Text
-          style={[
-            styles.transactionAmount,
-            transaction.type === "income"
-              ? styles.incomeAmount
-              : styles.expenseAmount,
-          ]}
+          className={[
+            "text-base font-bold ml-4",
+            transaction.type === "income" ? "text-income" : "text-expense",
+          ].join(" ")}
         >
           {transaction.type === "income" ? "+" : "-"}
           {formatAmount(transaction.amount)}
@@ -158,27 +156,27 @@ export default function HistoryScreen() {
     const dailyBalance = calculateDailyBalance(transactions);
 
     return (
-      <View key={date} style={styles.dateGroup}>
-        <View style={styles.dateHeader}>
-          <Text style={styles.dateText}>{formatDateHeader(date)}</Text>
-          <View style={styles.dailyBalanceContainer}>
-            <Text style={styles.dailyBalanceText}>
+      <View key={date} className="mx-4 mb-4">
+        <View className="flex-row justify-between items-center mb-2 px-1">
+          <Text className="text-base text-text font-semibold">
+            {formatDateHeader(date)}
+          </Text>
+          <View className="flex-row gap-4">
+            <Text className="text-sm text-textSecondary">
               収入:{" "}
-              <Text style={styles.incomeAmount}>
+              <Text className="text-income">
                 {formatAmount(dailyBalance.income)}
               </Text>
             </Text>
-            <Text style={styles.dailyBalanceText}>
+            <Text className="text-sm text-textSecondary">
               支出:{" "}
-              <Text style={styles.expenseAmount}>
+              <Text className="text-expense">
                 {formatAmount(dailyBalance.expense)}
               </Text>
             </Text>
           </View>
         </View>
-        <Card style={styles.transactionCard}>
-          {transactions.map(renderTransactionItem)}
-        </Card>
+        <Card className="py-1">{transactions.map(renderTransactionItem)}</Card>
       </View>
     );
   };
@@ -198,54 +196,54 @@ export default function HistoryScreen() {
 
   return (
     <SafeAreaView
-      style={styles.safeArea}
+      className="flex-1 bg-background"
       edges={["top", "left", "right", "bottom"]}
     >
-      <View style={styles.header}>
-        <TouchableOpacity onPress={handleBack} style={styles.backButton}>
-          <Text style={styles.backButtonText}>←</Text>
+      <View className="flex-row items-center justify-between px-4 py-2 border-b border-border">
+        <TouchableOpacity onPress={handleBack} className="py-1 px-2 min-w-15">
+          <Text className="text-xl text-textSecondary">←</Text>
         </TouchableOpacity>
-        <Text style={styles.headerTitle}>取引履歴</Text>
-        <View style={styles.headerSpacer} />
+        <Text className="text-xl font-semibold text-text">取引履歴</Text>
+        <View className="min-w-15" />
       </View>
 
       <ScrollView
-        style={styles.scrollView}
+        className="flex-1"
         showsVerticalScrollIndicator={false}
         refreshControl={
           <RefreshControl
             refreshing={refreshing}
             onRefresh={onRefresh}
-            tintColor={theme.colors.primary}
-            colors={[theme.colors.primary]}
+            tintColor="#FFD700" // theme.colors.primary
+            colors={["#FFD700"]} // theme.colors.primary
           />
         }
       >
         {/* 総収支サマリー */}
-        <Card style={styles.summaryCard}>
-          <Text style={styles.summaryTitle}>総収支</Text>
-          <View style={styles.summaryRow}>
-            <View style={styles.summaryItem}>
-              <Text style={styles.summaryLabel}>総収入</Text>
-              <Text style={[styles.summaryAmount, styles.incomeAmount]}>
+        <Card className="mx-4 mb-2">
+          <Text className="text-xl font-semibold text-text mb-4">総収支</Text>
+          <View className="flex-row justify-between">
+            <View className="flex-1 items-center">
+              <Text className="text-sm text-textSecondary mb-1">総収入</Text>
+              <Text className="text-xl font-bold text-income">
                 {formatAmount(totalBalance.income)}
               </Text>
             </View>
-            <View style={styles.summaryItem}>
-              <Text style={styles.summaryLabel}>総支出</Text>
-              <Text style={[styles.summaryAmount, styles.expenseAmount]}>
+            <View className="flex-1 items-center">
+              <Text className="text-sm text-textSecondary mb-1">総支出</Text>
+              <Text className="text-xl font-bold text-expense">
                 {formatAmount(totalBalance.expense)}
               </Text>
             </View>
-            <View style={styles.summaryItem}>
-              <Text style={styles.summaryLabel}>残高</Text>
+            <View className="flex-1 items-center">
+              <Text className="text-sm text-textSecondary mb-1">残高</Text>
               <Text
-                style={[
-                  styles.summaryAmount,
+                className={[
+                  "text-xl font-bold",
                   totalBalance.income - totalBalance.expense >= 0
-                    ? styles.incomeAmount
-                    : styles.expenseAmount,
-                ]}
+                    ? "text-income"
+                    : "text-expense",
+                ].join(" ")}
               >
                 {formatAmount(totalBalance.income - totalBalance.expense)}
               </Text>
@@ -257,164 +255,15 @@ export default function HistoryScreen() {
         {transactionGroups.length > 0 ? (
           transactionGroups.map(renderDateGroup)
         ) : (
-          <Card style={styles.emptyCard}>
-            <Text style={styles.emptyText}>取引履歴がありません</Text>
+          <Card className="mx-4 items-center py-8">
+            <Text className="text-base text-textSecondary">
+              取引履歴がありません
+            </Text>
           </Card>
         )}
 
-        <View style={styles.bottomSpacer} />
+        <View className="h-6" />
       </ScrollView>
     </SafeAreaView>
   );
 }
-
-const styles = StyleSheet.create({
-  safeArea: {
-    flex: 1,
-    backgroundColor: theme.colors.background,
-  },
-  header: {
-    flexDirection: "row",
-    alignItems: "center",
-    justifyContent: "space-between",
-    paddingHorizontal: theme.spacing.md,
-    paddingVertical: theme.spacing.sm,
-    borderBottomWidth: 1,
-    borderBottomColor: theme.colors.border,
-  },
-  backButton: {
-    paddingVertical: theme.spacing.xs,
-    paddingHorizontal: theme.spacing.sm,
-    minWidth: 60,
-  },
-  backButtonText: {
-    fontSize: 20,
-    color: theme.colors.textSecondary,
-  },
-  headerTitle: {
-    ...theme.typography.h3,
-    color: theme.colors.text,
-  },
-  headerSpacer: {
-    minWidth: 60,
-  },
-  scrollView: {
-    flex: 1,
-  },
-  summaryCard: {
-    margin: theme.spacing.md,
-    marginBottom: theme.spacing.sm,
-  },
-  summaryTitle: {
-    ...theme.typography.h3,
-    color: theme.colors.text,
-    marginBottom: theme.spacing.md,
-  },
-  summaryRow: {
-    flexDirection: "row",
-    justifyContent: "space-between",
-  },
-  summaryItem: {
-    flex: 1,
-    alignItems: "center",
-  },
-  summaryLabel: {
-    ...theme.typography.caption,
-    color: theme.colors.textSecondary,
-    marginBottom: theme.spacing.xs,
-  },
-  summaryAmount: {
-    ...theme.typography.h3,
-    fontWeight: "bold",
-  },
-  dateGroup: {
-    marginHorizontal: theme.spacing.md,
-    marginBottom: theme.spacing.md,
-  },
-  dateHeader: {
-    flexDirection: "row",
-    justifyContent: "space-between",
-    alignItems: "center",
-    marginBottom: theme.spacing.sm,
-    paddingHorizontal: theme.spacing.xs,
-  },
-  dateText: {
-    ...theme.typography.body,
-    color: theme.colors.text,
-    fontWeight: "600",
-  },
-  dailyBalanceContainer: {
-    flexDirection: "row",
-    gap: theme.spacing.md,
-  },
-  dailyBalanceText: {
-    ...theme.typography.caption,
-    color: theme.colors.textSecondary,
-  },
-  transactionCard: {
-    paddingVertical: theme.spacing.xs,
-  },
-  transactionItem: {
-    flexDirection: "row",
-    justifyContent: "space-between",
-    alignItems: "center",
-    paddingVertical: theme.spacing.sm,
-    paddingHorizontal: theme.spacing.xs,
-  },
-  transactionItemBorder: {
-    borderBottomWidth: 1,
-    borderBottomColor: theme.colors.border,
-  },
-  transactionLeft: {
-    flexDirection: "row",
-    alignItems: "center",
-    flex: 1,
-  },
-  categoryIconContainer: {
-    width: 36,
-    height: 36,
-    borderRadius: 18,
-    alignItems: "center",
-    justifyContent: "center",
-    marginRight: theme.spacing.sm,
-  },
-  categoryIcon: {
-    fontSize: 18,
-  },
-  transactionInfo: {
-    flex: 1,
-  },
-  transactionCategory: {
-    ...theme.typography.body,
-    color: theme.colors.text,
-    fontWeight: "500",
-  },
-  transactionMemo: {
-    ...theme.typography.caption,
-    color: theme.colors.textSecondary,
-    marginTop: 2,
-  },
-  transactionAmount: {
-    ...theme.typography.body,
-    fontWeight: "bold",
-    marginLeft: theme.spacing.md,
-  },
-  incomeAmount: {
-    color: theme.colors.income,
-  },
-  expenseAmount: {
-    color: theme.colors.expense,
-  },
-  emptyCard: {
-    margin: theme.spacing.md,
-    alignItems: "center",
-    paddingVertical: theme.spacing.xl,
-  },
-  emptyText: {
-    ...theme.typography.body,
-    color: theme.colors.textSecondary,
-  },
-  bottomSpacer: {
-    height: theme.spacing.lg,
-  },
-});

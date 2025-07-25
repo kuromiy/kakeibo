@@ -3,10 +3,8 @@ import {
   View,
   Text,
   TouchableOpacity,
-  StyleSheet,
   ViewStyle,
 } from "react-native";
-import { theme } from "../../../shared/styles/theme";
 import { Category } from "../../../shared/constants/mockData";
 
 interface CategorySelectorProps {
@@ -15,6 +13,7 @@ interface CategorySelectorProps {
   onCategorySelect: (category: Category) => void;
   style?: ViewStyle;
   numColumns?: number;
+  className?: string;
 }
 
 export const CategorySelector: React.FC<CategorySelectorProps> = ({
@@ -23,94 +22,67 @@ export const CategorySelector: React.FC<CategorySelectorProps> = ({
   onCategorySelect,
   style,
   numColumns = 3,
+  className,
 }) => {
   const renderCategoryItem = (category: Category) => {
     const isSelected = selectedCategory?.id === category.id;
 
+    // カテゴリアイテムのクラス
+    const categoryItemClassName = [
+      "items-center justify-center py-4 px-2 rounded-md border-2 min-h-20",
+      isSelected 
+        ? "border-primary bg-background" 
+        : "border-transparent bg-surface",
+    ].join(" ");
+
+    // アイコンコンテナのクラス
+    const iconContainerClassName = "w-10 h-10 rounded-full items-center justify-center mb-1";
+
+    // カテゴリ名のクラス
+    const categoryNameClassName = [
+      "text-sm text-center font-medium",
+      isSelected ? "text-primary" : "text-text",
+    ].join(" ");
+
     return (
       <TouchableOpacity
         key={category.id}
-        style={[
-          styles.categoryItem,
-          { width: `${100 / numColumns - 2}%` },
-          isSelected && styles.categoryItemSelected,
-        ]}
+        className={categoryItemClassName}
+        style={{ width: `${100 / numColumns - 2}%` }}
         onPress={() => onCategorySelect(category)}
         activeOpacity={0.7}
       >
         <View
-          style={[
-            styles.iconContainer,
-            {
-              backgroundColor: isSelected
-                ? category.color
-                : theme.colors.background,
-            },
-          ]}
+          className={iconContainerClassName}
+          style={{
+            backgroundColor: isSelected
+              ? category.color
+              : "#0A0A0A", // theme.colors.background
+          }}
         >
-          <Text style={styles.categoryIcon}>{category.icon}</Text>
+          <Text style={{ fontSize: 20 }}>{category.icon}</Text>
         </View>
-        <Text
-          style={[
-            styles.categoryName,
-            isSelected && { color: theme.colors.primary },
-          ]}
-        >
+        <Text className={categoryNameClassName}>
           {category.name}
         </Text>
       </TouchableOpacity>
     );
   };
 
+  // コンテナクラス
+  const containerClassName = [
+    "w-full",
+    className,
+  ].filter(Boolean).join(" ");
+
+  // グリッドクラス
+  const categoriesGridClassName = "flex-row flex-wrap justify-between gap-2";
+
   return (
-    <View style={[styles.container, style]}>
-      <View style={styles.categoriesGrid}>
+    <View className={containerClassName} style={style}>
+      <View className={categoriesGridClassName}>
         {categories.map(renderCategoryItem)}
       </View>
     </View>
   );
 };
-
-const styles = StyleSheet.create({
-  container: {
-    width: "100%",
-  },
-  categoriesGrid: {
-    flexDirection: "row",
-    flexWrap: "wrap",
-    justifyContent: "space-between",
-    gap: theme.spacing.sm,
-  },
-  categoryItem: {
-    alignItems: "center",
-    justifyContent: "center",
-    paddingVertical: theme.spacing.md,
-    paddingHorizontal: theme.spacing.sm,
-    backgroundColor: theme.colors.surface,
-    borderRadius: theme.borderRadius.md,
-    borderWidth: 2,
-    borderColor: "transparent",
-    minHeight: 80,
-  },
-  categoryItemSelected: {
-    borderColor: theme.colors.primary,
-    backgroundColor: theme.colors.background,
-  },
-  iconContainer: {
-    width: 40,
-    height: 40,
-    borderRadius: 20,
-    alignItems: "center",
-    justifyContent: "center",
-    marginBottom: theme.spacing.xs,
-  },
-  categoryIcon: {
-    fontSize: 20,
-  },
-  categoryName: {
-    ...theme.typography.caption,
-    color: theme.colors.text,
-    textAlign: "center",
-    fontWeight: "500",
-  },
-});

@@ -3,12 +3,10 @@ import {
   View,
   Text,
   TextInput,
-  StyleSheet,
   ViewStyle,
   TextStyle,
   KeyboardTypeOptions,
 } from "react-native";
-import { theme } from "../styles/theme";
 
 interface FormInputProps {
   label: string;
@@ -23,6 +21,8 @@ interface FormInputProps {
   required?: boolean;
   style?: ViewStyle;
   inputStyle?: TextStyle;
+  className?: string;
+  inputClassName?: string;
 }
 
 export const FormInput: React.FC<FormInputProps> = ({
@@ -38,83 +38,64 @@ export const FormInput: React.FC<FormInputProps> = ({
   required = false,
   style,
   inputStyle,
+  className,
+  inputClassName,
 }) => {
+  // コンテナクラス
+  const containerClassName = [
+    "mb-4",
+    className,
+  ].filter(Boolean).join(" ");
+
+  // ラベルコンテナクラス
+  const labelContainerClassName = "flex-row items-center mb-2";
+
+  // ラベルクラス
+  const labelClassName = "text-base font-semibold text-text";
+
+  // 必須マーククラス
+  const requiredClassName = "text-error text-base ml-1";
+
+  // インプットクラス
+  const inputBaseClassName = "text-base text-text bg-background border border-border rounded-md py-2 px-4 min-h-12";
+  const inputMultilineClassName = multiline ? "min-h-20 pt-2" : "";
+  const inputErrorClassName = error ? "border-error" : "";
+  const inputDisabledClassName = !editable ? "bg-surface opacity-70" : "";
+
+  const finalInputClassName = [
+    inputBaseClassName,
+    inputMultilineClassName,
+    inputErrorClassName,
+    inputDisabledClassName,
+    inputClassName,
+  ].filter(Boolean).join(" ");
+
+  // エラーテキストクラス
+  const errorTextClassName = "text-sm text-error mt-1";
+
   return (
-    <View style={[styles.container, style]}>
-      <View style={styles.labelContainer}>
-        <Text style={styles.label}>{label}</Text>
-        {required && <Text style={styles.required}>*</Text>}
+    <View className={containerClassName} style={style}>
+      <View className={labelContainerClassName}>
+        <Text className={labelClassName}>{label}</Text>
+        {required && <Text className={requiredClassName}>*</Text>}
       </View>
 
       <TextInput
-        style={[
-          styles.input,
-          multiline && styles.multilineInput,
-          error && styles.inputError,
-          !editable && styles.inputDisabled,
-          inputStyle,
-        ]}
+        className={finalInputClassName}
+        style={inputStyle}
         value={value}
         onChangeText={onChangeText}
         placeholder={placeholder}
-        placeholderTextColor={theme.colors.textSecondary}
+        placeholderTextColor="#CCCCCC" // theme.colors.textSecondary
         keyboardType={keyboardType}
         multiline={multiline}
         numberOfLines={multiline ? numberOfLines : 1}
         editable={editable}
-        selectionColor={theme.colors.primary}
+        selectionColor="#FFD700" // theme.colors.primary
+        textAlignVertical={multiline ? "top" : "center"}
       />
 
-      {error && <Text style={styles.errorText}>{error}</Text>}
+      {error && <Text className={errorTextClassName}>{error}</Text>}
     </View>
   );
 };
-
-const styles = StyleSheet.create({
-  container: {
-    marginBottom: theme.spacing.md,
-  },
-  labelContainer: {
-    flexDirection: "row",
-    alignItems: "center",
-    marginBottom: theme.spacing.sm,
-  },
-  label: {
-    ...theme.typography.body,
-    color: theme.colors.text,
-    fontWeight: "600",
-  },
-  required: {
-    color: theme.colors.error,
-    fontSize: theme.typography.body.fontSize,
-    marginLeft: theme.spacing.xs,
-  },
-  input: {
-    ...theme.typography.body,
-    color: theme.colors.text,
-    backgroundColor: theme.colors.background,
-    borderWidth: 1,
-    borderColor: theme.colors.border,
-    borderRadius: theme.borderRadius.md,
-    paddingVertical: theme.spacing.sm,
-    paddingHorizontal: theme.spacing.md,
-    minHeight: 48,
-  },
-  multilineInput: {
-    minHeight: 80,
-    textAlignVertical: "top",
-    paddingTop: theme.spacing.sm,
-  },
-  inputError: {
-    borderColor: theme.colors.error,
-  },
-  inputDisabled: {
-    backgroundColor: theme.colors.surface,
-    opacity: 0.7,
-  },
-  errorText: {
-    ...theme.typography.caption,
-    color: theme.colors.error,
-    marginTop: theme.spacing.xs,
-  },
-});
