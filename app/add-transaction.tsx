@@ -1,28 +1,27 @@
+import { router, useLocalSearchParams } from "expo-router";
 import React, { useState } from "react";
 import {
-  View,
-  Text,
-  TextInput,
-  ScrollView,
-  TouchableOpacity,
-  Pressable,
-  Modal,
   Alert,
   KeyboardAvoidingView,
-  Platform,
+  Modal,
+  Pressable,
+  ScrollView,
+  Text,
+  TextInput,
+  TouchableOpacity,
+  View,
 } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
-import { router, useLocalSearchParams } from "expo-router";
-import { Card } from "../shared/components/Card";
-import { Button } from "../shared/components/Button";
-import { AmountInput } from "../features/transaction/components/AmountInput";
 import { Calendar } from "../features/calendar/components/Calendar";
+import { AmountInput } from "../features/transaction/components/AmountInput";
+import { useTransactionValidation } from "../features/transaction/hooks/useTransactionValidation";
+import { Button } from "../shared/components/Button";
+import { Card } from "../shared/components/Card";
 import {
-  mockCategories,
   Category,
   addTransaction,
+  mockCategories,
 } from "../shared/constants/mockData";
-import { useTransactionValidation } from "../features/transaction/hooks/useTransactionValidation";
 
 type TransactionType = "income" | "expense";
 
@@ -172,10 +171,7 @@ export default function AddTransactionScreen() {
         <View className="min-w-15" />
       </View>
 
-      <KeyboardAvoidingView
-        behavior={Platform.OS === "ios" ? "padding" : "height"}
-        className="flex-1"
-      >
+      <KeyboardAvoidingView behavior="padding" className="flex-1">
         <ScrollView
           className="flex-1"
           showsVerticalScrollIndicator={false}

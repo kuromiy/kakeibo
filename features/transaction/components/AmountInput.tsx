@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useRef } from "react";
 import {
   View,
   Text,
@@ -25,6 +25,7 @@ export const AmountInput: React.FC<AmountInputProps> = ({
   className,
 }) => {
   const [isFocused, setIsFocused] = useState(false);
+  const inputRef = useRef<TextInput>(null);
 
   // 数値をフォーマット（カンマ区切り）
   const formatNumber = (num: string) => {
@@ -69,11 +70,15 @@ export const AmountInput: React.FC<AmountInputProps> = ({
     <View className={containerClassName} style={style}>
       <TouchableOpacity
         className={inputContainerClassName}
-        onPress={() => setIsFocused(true)}
+        onPress={() => {
+          setIsFocused(true);
+          inputRef.current?.focus();
+        }}
         activeOpacity={1}
       >
         <Text className={currencySymbolClassName}>¥</Text>
         <TextInput
+          ref={inputRef}
           className={amountInputClassName}
           value={isFocused ? value : displayValue}
           onChangeText={handleChangeText}
