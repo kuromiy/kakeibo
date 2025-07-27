@@ -5,7 +5,7 @@ import {
   TouchableOpacity,
   ViewStyle,
 } from "react-native";
-import { Category } from "../../../shared/constants/mockData";
+import type { Category } from "../../database/schema";
 
 interface CategorySelectorProps {
   categories: Category[];

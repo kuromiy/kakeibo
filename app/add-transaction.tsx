@@ -10,6 +10,7 @@ import {
   TextInput,
   TouchableOpacity,
   View,
+  ActivityIndicator,
 } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { Calendar } from "../features/calendar/components/Calendar";
@@ -17,11 +18,9 @@ import { AmountInput } from "../features/transaction/components/AmountInput";
 import { useTransactionValidation } from "../features/transaction/hooks/useTransactionValidation";
 import { Button } from "../shared/components/Button";
 import { Card } from "../shared/components/Card";
-import {
-  Category,
-  addTransaction,
-  mockCategories,
-} from "../shared/constants/mockData";
+import { useCategories } from "../features/category/hooks/useCategories";
+import { useTransactions } from "../features/transaction/hooks/useTransactions";
+import type { Category } from "../features/database/schema";
 
 type TransactionType = "income" | "expense";
 
@@ -47,9 +46,9 @@ export default function AddTransactionScreen() {
     isValid: isFormValid,
   } = useTransactionValidation();
 
-  const filteredCategories = mockCategories.filter(
-    (category) => category.type === transactionType,
-  );
+  const { categories, loading: categoriesLoading } =
+    useCategories(transactionType);
+  const { addTransaction } = useTransactions();
 
   const formatDate = (date: Date) => {
     return date.toLocaleDateString("ja-JP", {
@@ -106,7 +105,11 @@ export default function AddTransactionScreen() {
       };
 
       // トランザクションを追加
-      addTransaction(transactionData);
+      const result = await addTransaction(transactionData);
+
+      if (!result) {
+        throw new Error("Failed to add transaction");
+      }
 
       // 成功通知
       Alert.alert("保存完了", "取引を保存しました", [
@@ -245,31 +248,37 @@ export default function AddTransactionScreen() {
             <Text className="text-xl font-semibold text-text mb-4">
               カテゴリ
             </Text>
-            <View className="flex-row flex-wrap gap-2">
-              {filteredCategories.map((category) => (
-                <TouchableOpacity
-                  key={category.id}
-                  className={[
-                    "items-center justify-center py-4 px-2 bg-background rounded-md border-2 min-h-20",
-                    selectedCategory?.id === category.id
-                      ? "border-primary"
-                      : "border-transparent",
-                    errors.category && !selectedCategory && "border-error",
-                  ]
-                    .filter(Boolean)
-                    .join(" ")}
-                  style={{ width: "30%" }}
-                  onPress={() => handleCategoryChange(category)}
-                >
-                  <Text style={{ fontSize: 24, marginBottom: 4 }}>
-                    {category.icon}
-                  </Text>
-                  <Text className="text-sm text-text text-center font-medium">
-                    {category.name}
-                  </Text>
-                </TouchableOpacity>
-              ))}
-            </View>
+            {categoriesLoading ? (
+              <View className="py-8 items-center">
+                <ActivityIndicator size="large" color="#10B981" />
+              </View>
+            ) : (
+              <View className="flex-row flex-wrap gap-2">
+                {categories.map((category) => (
+                  <TouchableOpacity
+                    key={category.id}
+                    className={[
+                      "items-center justify-center py-4 px-2 bg-background rounded-md border-2 min-h-20",
+                      selectedCategory?.id === category.id
+                        ? "border-primary"
+                        : "border-transparent",
+                      errors.category && !selectedCategory && "border-error",
+                    ]
+                      .filter(Boolean)
+                      .join(" ")}
+                    style={{ width: "30%" }}
+                    onPress={() => handleCategoryChange(category)}
+                  >
+                    <Text style={{ fontSize: 24, marginBottom: 4 }}>
+                      {category.icon}
+                    </Text>
+                    <Text className="text-sm text-text text-center font-medium">
+                      {category.name}
+                    </Text>
+                  </TouchableOpacity>
+                ))}
+              </View>
+            )}
             {errors.category && (
               <Text className="text-sm text-error mt-1">{errors.category}</Text>
             )}

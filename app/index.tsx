@@ -1,22 +1,47 @@
 import React from "react";
-import { View, Text, ScrollView, TouchableOpacity } from "react-native";
+import {
+  View,
+  Text,
+  ScrollView,
+  TouchableOpacity,
+  ActivityIndicator,
+} from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
-import { router } from "expo-router";
+import { router, useFocusEffect } from "expo-router";
 import { Card } from "../shared/components/Card";
 import { FAB } from "../features/home/components/FAB";
 import {
-  getTodayBalance,
-  getMonthlyBalance,
-  getRecentTransactions,
-  formatAmount,
-  getCategoryByName,
-  Transaction,
-} from "../shared/constants/mockData";
-
+  useTodayBalance,
+  useMonthlyBalance,
+} from "../features/home/hooks/useBalance";
+import { useRecentTransactions } from "../features/transaction/hooks/useTransactions";
+import { TransactionItem } from "../features/home/components/TransactionItem";
+import { balanceService } from "../features/home/services/balanceService";
 export default function HomeScreen() {
-  const todayBalance = getTodayBalance();
-  const monthlyBalance = getMonthlyBalance();
-  const recentTransactions = getRecentTransactions(5);
+  const {
+    balance: todayBalance,
+    loading: todayLoading,
+    refetch: refetchToday,
+  } = useTodayBalance();
+  const {
+    balance: monthlyBalance,
+    loading: monthlyLoading,
+    refetch: refetchMonthly,
+  } = useMonthlyBalance();
+  const {
+    transactions: recentTransactions,
+    loading: transactionsLoading,
+    refetch: refetchTransactions,
+  } = useRecentTransactions(5);
+
+  // 画面がフォーカスされたときにデータを更新
+  useFocusEffect(
+    React.useCallback(() => {
+      refetchToday();
+      refetchMonthly();
+      refetchTransactions();
+    }, [refetchToday, refetchMonthly, refetchTransactions]),
+  );
 
   const handleAddIncome = () => {
     router.push("/add-transaction?type=income");
@@ -26,49 +51,13 @@ export default function HomeScreen() {
     router.push("/add-transaction?type=expense");
   };
 
-  const renderTransactionItem = (transaction: Transaction) => {
-    const category = getCategoryByName(transaction.category);
-
+  if (todayLoading || monthlyLoading || transactionsLoading) {
     return (
-      <View
-        key={transaction.id}
-        className="flex-row justify-between items-center py-2 border-b border-border"
-      >
-        <View className="flex-row items-center flex-1">
-          {category && (
-            <View
-              className="w-9 h-9 rounded-full items-center justify-center mr-2"
-              style={{ backgroundColor: category.color }}
-            >
-              <Text style={{ fontSize: 18 }}>{category.icon}</Text>
-            </View>
-          )}
-          <View className="flex-1">
-            <Text className="text-base text-text font-semibold">
-              {transaction.category}
-            </Text>
-            <Text className="text-sm text-textSecondary mt-0.5">
-              {transaction.date}
-            </Text>
-            {transaction.memo && (
-              <Text className="text-sm text-textSecondary mt-0.5">
-                {transaction.memo}
-              </Text>
-            )}
-          </View>
-        </View>
-        <Text
-          className={[
-            "text-base font-bold ml-4",
-            transaction.type === "income" ? "text-income" : "text-expense",
-          ].join(" ")}
-        >
-          {transaction.type === "income" ? "+" : "-"}
-          {formatAmount(transaction.amount)}
-        </Text>
-      </View>
+      <SafeAreaView className="flex-1 bg-background items-center justify-center">
+        <ActivityIndicator size="large" color="#10B981" />
+      </SafeAreaView>
     );
-  };
+  }
 
   return (
     <SafeAreaView
@@ -92,24 +81,23 @@ export default function HomeScreen() {
             <View className="flex-1 items-center">
               <Text className="text-sm text-textSecondary mb-1">収入</Text>
               <Text className="text-xl font-bold text-income">
-                {formatAmount(todayBalance.income)}
+                {balanceService.formatAmount(todayBalance.income)}
               </Text>
             </View>
             <View className="flex-1 items-center">
               <Text className="text-sm text-textSecondary mb-1">支出</Text>
               <Text className="text-xl font-bold text-expense">
-                {formatAmount(todayBalance.expense)}
+                {balanceService.formatAmount(todayBalance.expense)}
               </Text>
             </View>
             <View className="flex-1 items-center">
               <Text className="text-sm text-textSecondary mb-1">残高</Text>
               <Text
-                className={[
-                  "text-xl font-bold",
-                  todayBalance.balance >= 0 ? "text-income" : "text-expense",
-                ].join(" ")}
+                className={`text-xl font-bold ${
+                  todayBalance.balance >= 0 ? "text-income" : "text-expense"
+                }`}
               >
-                {formatAmount(todayBalance.balance)}
+                {balanceService.formatAmount(todayBalance.balance)}
               </Text>
             </View>
           </View>
@@ -124,24 +112,23 @@ export default function HomeScreen() {
             <View className="flex-1 items-center">
               <Text className="text-sm text-textSecondary mb-1">収入</Text>
               <Text className="text-xl font-bold text-income">
-                {formatAmount(monthlyBalance.income)}
+                {balanceService.formatAmount(monthlyBalance.income)}
               </Text>
             </View>
             <View className="flex-1 items-center">
               <Text className="text-sm text-textSecondary mb-1">支出</Text>
               <Text className="text-xl font-bold text-expense">
-                {formatAmount(monthlyBalance.expense)}
+                {balanceService.formatAmount(monthlyBalance.expense)}
               </Text>
             </View>
             <View className="flex-1 items-center">
               <Text className="text-sm text-textSecondary mb-1">残高</Text>
               <Text
-                className={[
-                  "text-xl font-bold",
-                  monthlyBalance.balance >= 0 ? "text-income" : "text-expense",
-                ].join(" ")}
+                className={`text-xl font-bold ${
+                  monthlyBalance.balance >= 0 ? "text-income" : "text-expense"
+                }`}
               >
-                {formatAmount(monthlyBalance.balance)}
+                {balanceService.formatAmount(monthlyBalance.balance)}
               </Text>
             </View>
           </View>
@@ -162,7 +149,12 @@ export default function HomeScreen() {
           </View>
           {recentTransactions.length > 0 ? (
             <View className="gap-2">
-              {recentTransactions.map(renderTransactionItem)}
+              {recentTransactions.map((transaction) => (
+                <TransactionItem
+                  key={transaction.id}
+                  transaction={transaction}
+                />
+              ))}
             </View>
           ) : (
             <Text className="text-base text-textSecondary text-center py-6">

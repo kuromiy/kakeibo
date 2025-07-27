@@ -1,11 +1,30 @@
+import { db } from "@/features/database";
+import { seedCategories } from "@/features/database/seed";
+import { useMigrations } from "drizzle-orm/expo-sqlite/migrator";
 import { useFonts } from "expo-font";
 import { Stack } from "expo-router";
 import { StatusBar } from "expo-status-bar";
+import { useEffect } from "react";
 import "react-native-reanimated";
 import { SafeAreaProvider } from "react-native-safe-area-context";
+import migrations from "../drizzle/migrations";
 import "../global.css";
 
 export default function RootLayout() {
+  const { success, error } = useMigrations(db, migrations);
+
+  useEffect(() => {
+    if (success) {
+      console.log("Migrations completed successfully");
+      // マイグレーション成功後にカテゴリのシーディングを実行
+      seedCategories();
+    }
+  }, [success]);
+
+  if (error) {
+    console.error("Migration error:", error);
+  }
+
   const [loaded] = useFonts({
     SpaceMono: require("../assets/fonts/SpaceMono-Regular.ttf"),
   });
