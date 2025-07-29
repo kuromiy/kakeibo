@@ -1,0 +1,7 @@
+appId: com.kakeibo.app
+---
+- launchApp
+- assertVisible: "家計簿"
+- assertVisible: "今日の収支"
+- assertVisible: "今月の収支"
+- assertVisible: "最近の取引"
