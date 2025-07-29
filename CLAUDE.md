@@ -18,6 +18,14 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 - `npm run web`: Web向けExpo起動
 - `npm run reset-project`: プロジェクトリセット
 
+### 開発ビルド
+- `npx expo run:android`: Android開発ビルドの生成・実行
+- `npx expo run:ios`: iOS開発ビルドの生成・実行
+
+### E2Eテスト（Maestro）
+- `npm run maestro:test`: E2Eテストの実行（開発ビルドが必要）
+- `npm run maestro:studio`: Maestro Studioの起動
+
 ### コード品質チェック
 - `npm run check`: TypeScriptの型チェック（コンパイルなし）
 - `npm run lint`: ESLintによるコードリント
@@ -45,6 +53,7 @@ scripts/      # 開発用スクリプト
 - React Native 0.79.5
 - Expo ~53.0.20
 - Expo Router ~5.1.4
+- Expo Dev Client ~5.2.4（開発ビルド環境）
 
 ### ナビゲーション・UI
 - React Navigation (Bottom Tabs, Elements, Native)
@@ -75,9 +84,9 @@ scripts/      # 開発用スクリプト
 ## 開発上の注意点
 
 ### テスト環境
-- 現在テストフレームワークは未構築
-- `npm test`はプレースホルダー状態
-- 将来的にテスト環境の構築が必要
+- **E2Eテスト**: Maestroを使用（開発ビルド環境で実行）
+- **単体テスト**: 現在未構築（`npm test`はプレースホルダー状態）
+- 将来的に単体テスト環境の構築が必要
 
 ### コミット規約
 - conventional commitsに従ったコミットメッセージが必須
